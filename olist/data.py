@@ -1,7 +1,6 @@
 from pathlib import Path
 import pandas as pd
 
-
 class Olist:
     """
     The Olist class provides methods to interact with Olist's e-commerce data.
@@ -20,8 +19,31 @@ class Olist:
         Its keys should be 'sellers', 'orders', 'order_items' etc...
         Its values should be pandas.DataFrames loaded from csv files
         """
-        pass  # YOUR CODE HERE
+        csv_path = Path("~/.workintech/olist/data/csv").expanduser()
+        file_paths = list(csv_path.iterdir())
+        
+        file_names = [Path(f).name for f in file_paths if f.is_file()]
+        
+        key_names = []
 
+        for k in file_names:
+            if '_dataset.csv' in k:
+                k = k.replace("_dataset.csv", "")
+            elif '.csv' in k:
+                k = k.replace(".csv", "")
+            
+            if 'olist_' in k:
+                k = k.replace("olist_", "")
+                
+            key_names.append(k)
+        
+        data = {}
+
+        for key, file_path in zip(key_names, file_paths):
+            data[key] = pd.read_csv(file_path)
+        
+        return data
+            
     def ping(self):
         """
         You call ping I print pong.
