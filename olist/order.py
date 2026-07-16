@@ -62,7 +62,12 @@ class Order:
         Returns a DataFrame with:
         order_id, number_of_items
         """
-        pass  # YOUR CODE HERE
+        # YOUR CODE HERE
+        df = self.data['order_items'].copy()
+        return df.groupby('order_id').count()\
+            .rename(columns={"order_item_id": "number_of_items"})\
+            .sort_values("number_of_items", ascending=False)[['number_of_items']]\
+            .reset_index()[['order_id', 'number_of_items']]      
 
     def get_number_sellers(self):
         """
