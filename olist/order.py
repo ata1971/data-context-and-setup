@@ -74,7 +74,12 @@ class Order:
         Returns a DataFrame with:
         order_id, number_of_sellers
         """
-        pass  # YOUR CODE HERE
+        # YOUR CODE HERE
+        df = self.data['order_items'].copy()
+        return df.groupby('order_id').count()\
+            .rename(columns={"seller_id": "number_of_sellers"})\
+            .sort_values("number_of_sellers", ascending=False)[['number_of_sellers']]\
+            .reset_index()[['order_id', 'number_of_sellers']] 
 
     def get_price_and_freight(self):
         """
