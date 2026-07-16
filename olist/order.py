@@ -20,14 +20,42 @@ class Order:
         and filters out non-delivered orders unless specified
         """
         # Hint: Within this instance method, you have access to the instance of the class Order in the variable self, as well as all its attributes
-        pass  # YOUR CODE HERE
+        # YOUR CODE HERE
+        orders = self.data['orders'].copy()
+        df = orders[orders['order_status'] == 'delivered']
+
+        time_columns = [
+            'order_purchase_timestamp',
+            'order_approved_at',
+            'order_delivered_carrier_date',
+            'order_delivered_customer_date',
+            'order_estimated_delivery_date'
+        ]
+        
+        for col in time_columns:
+            df[col] = pd.to_datetime(df[col])
+
+        df['wait_time'] = (df['order_delivered_customer_date'] - df['order_purchase_timestamp'])/np.timedelta64(1, 'D')
+        df['expected_wait_time'] = (df['order_estimated_delivery_date'] - df['order_purchase_timestamp'])/np.timedelta64(1, 'D')
+
+        delay = df['expected_wait_time'] - df['wait_time']
+
+        df['delay_vs_expected'] = np.where(delay > 0, delay, 0)
+        
+        return df[['order_id', 'wait_time', 'expected_wait_time', 'delay_vs_expected', 'order_status']]
 
     def get_review_score(self):
         """
         Returns a DataFrame with:
         order_id, dim_is_five_star, dim_is_one_star, review_score
         """
-        pass  # YOUR CODE HERE
+        # YOUR CODE HERE
+        df = self.data['order_reviews'].copy()
+        
+        df['dim_is_five_star'] = df['review_score'].map({5: 1}).fillna(0).astype(int)
+        df['dim_is_one_star'] = df['review_score'].apply(lambda x: 1 if x == 1 else 0)
+
+        return df[['order_id', 'dim_is_five_star', 'dim_is_one_star', 'review_score']]
 
     def get_number_items(self):
         """
